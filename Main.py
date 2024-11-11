@@ -13,7 +13,7 @@ def message():
         # Log data to the console
         print(f"Received message: {data}")
         # Respond to the client
-        return jsonify({"response": "Message received"}), 200
+        return jsonify({"response": "this is from railway"}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
