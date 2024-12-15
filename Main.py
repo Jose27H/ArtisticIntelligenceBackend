@@ -30,7 +30,6 @@ class User(db.Model):
         self.name = name
 
 
-# Endpoint: Login
 @app.route('/login', methods=['POST'])
 def login():
     # Get the ID token from the request body
@@ -56,11 +55,12 @@ def login():
             user_id = existing_user.id
         else:
             # Add a new user to the database
+            print(f"Creating new user: {email}")
             new_user = User(email=email, name=name)
             db.session.add(new_user)
-            db.session.commit()
+            db.session.commit()  # Ensure the transaction is committed
             user_id = new_user.id
-            print(f"New user created: {new_user.email}")
+            print(f"New user created with ID: {user_id}")
 
         # Return a success response with user details
         return jsonify({
@@ -74,6 +74,12 @@ def login():
         # Invalid token
         print(f"Token verification failed: {e}")
         return jsonify({"error": "Invalid ID Token"}), 401
+
+    except Exception as e:
+        # Log unexpected errors
+        print(f"Unexpected error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 
 # Endpoint: Message
