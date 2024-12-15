@@ -37,6 +37,7 @@ def login():
     token = data.get('token')
 
     if not token:
+        print("token not")
         return jsonify({"error": "ID Token is missing"}), 400
 
     try:
