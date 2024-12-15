@@ -32,12 +32,13 @@ class User(db.Model):
 
 @app.route('/login', methods=['POST'])
 def login():
+    print("login init")
     # Get the ID token from the request body
     data = request.get_json()
     token = data.get('token')
 
     if not token:
-        print("token not")
+        
         return jsonify({"error": "ID Token is missing"}), 400
 
     try:
