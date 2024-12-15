@@ -10,12 +10,18 @@ def message():
     if request.is_json:
         # Extract JSON data
         data = request.get_json()
-        # Log data to the console
-        print(f"Received message: {data}")
-        # Respond to the client
-        return jsonify({"response": "this is from railway"}), 200
+        
+        # Extract the message from the request
+        message = data.get("message", "No message provided")
+        
+        # Log the received data to the console
+        print(f"Received message: {message}")
+        
+        # Respond back with the received message
+        return jsonify({"response": f"You sent: {message}"}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
+
 
 
 if __name__ == '__main__':
