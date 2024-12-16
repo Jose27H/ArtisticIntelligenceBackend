@@ -109,14 +109,14 @@ def load_name():
     try:
         # Parse the JSON payload from the request
         data = request.get_json()
-        google_id = data.get('google_id')
+        user_id = data.get('user_id')
 
         # Check if the Google ID is provided
-        if not google_id:
+        if not user_id:
             return jsonify({"error": "Google ID is missing"}), 400
 
         # Query the database for the user with the given Google ID
-        user = User.query.filter_by(google_id=google_id).first()
+        user = User.query.filter_by(id=user_id).first()
 
         if user:
             # Return the user's name
