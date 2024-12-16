@@ -102,6 +102,33 @@ def message():
         return jsonify({"response": f"You sent: {message}"}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
+    
+
+@app.route('/loadName', methods=['POST'])
+def load_name():
+    try:
+        # Parse the JSON payload from the request
+        data = request.get_json()
+        google_id = data.get('google_id')
+
+        # Check if the Google ID is provided
+        if not google_id:
+            return jsonify({"error": "Google ID is missing"}), 400
+
+        # Query the database for the user with the given Google ID
+        user = User.query.filter_by(google_id=google_id).first()
+
+        if user:
+            # Return the user's name
+            return jsonify({"name": user.name}), 200
+        else:
+            # User not found
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        # Log unexpected errors and return a 500 error
+        print(f"Error in /loadName: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 # Initialize the database
