@@ -169,7 +169,7 @@ def generate():
         user_id = data.get('user_id')
         # Check if the Google ID is provided
         if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
+            return jsonify({"error": "Google ID is missing "+str(user_id)}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
