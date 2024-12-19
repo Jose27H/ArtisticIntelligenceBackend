@@ -13,8 +13,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Replace this with your Web Client ID from Google Cloud Console
-CLIENT_ID = "106905994125-blt7hpufeifo2lt46gafm8frf9fmaed5.apps.googleusercontent.com"
-SD_API_KEY = os.environ.get('SD_API_KEY')
+CLIENT_ID = os.environ.get('CLIENT_ID')
+SD_API_KEY = "sk-7pxhh6aU3wEzQW9VCTqbiDASmMMXgQhUmw7PbedAimUyOjVl"#os.environ.get('SD_API_KEY')
 
 # Replace this with your PostgreSQL connection URL
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:dEuOkPJxLBZbVAmThWQzjcordfOVBNdw@postgres.railway.internal:5432/railway"
