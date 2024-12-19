@@ -483,6 +483,38 @@ def removeBackgroundAndRelight():
         return jsonify({"error": "Internal server error"}), 500
 
 
+@app.route('/viewallimages', methods=['POST'])
+def view_all_images():
+    try:
+        # (Optional) Parse additional filters or parameters from the POST body
+        data = request.get_json()
+        user_id = data.get('user_id')  # If you want to filter by user_id, optional
+
+        # Query images from the database
+        if user_id:
+            images = Image.query.filter_by(user_id=user_id).all()
+        else:
+            images = Image.query.all()
+
+        if not images:
+            return jsonify({"message": "No images found."}), 404
+
+        # Prepare the response with base64 encoded images
+        images_data = []
+        for image in images:
+            images_data.append({
+                "id": image.id,
+                "user_id": image.user_id,
+                "image": base64.b64encode(image.image).decode('utf-8'),  # Encode binary data to base64
+                "date": image.date.strftime('%Y-%m-%d %H:%M:%S')  # Format the date
+            })
+
+        return jsonify(images_data), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 # Initialize the database
 if __name__ == '__main__':
