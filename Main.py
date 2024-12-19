@@ -207,7 +207,7 @@ def sketch():
         except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
-        b64String = data.get('b64String')
+        b64String = data.get('b64_string')
         # Check if the Google ID is provided
 
         # Query the database for the user with the given Google ID
