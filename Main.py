@@ -1,5 +1,5 @@
 import os
-from requestHelper import generateRequest, sketchRequest, styleRequest
+from requestHelper import generateRequest, sketchRequest, styleRequest, outpaintRequest
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -278,6 +278,63 @@ def style():
         # Log unexpected errors and return a 500 error
         print(f"Error in /style: {e}")
         return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/outpaint', methods=['POST'])
+def outpaint():
+    #Required: filetype, creativity, user_id, b64String, (left&&right&&up&&down != ""||0)
+    #Optional: seed, prompt, every other direction
+    try:
+        # Parse the JSON payload from the request
+        data = request.get_json()
+        prompt = data.get('prompt')
+        filetype = data.get('filetype')
+        seed = int(data.get('seed'))
+        if seed == "":
+            seed = 42 # If no seed is provided, use 42 because it's the answer to everything
+        user_id = data.get('user_id')
+        b64String = data.get('b64String')
+        try:
+            left = int(data.get('left'))
+        except:
+            left = 0
+        try:
+            right = int(data.get('right'))
+        except:
+            right = 0
+        try:
+            up = int(data.get('up'))
+        except:
+            up = 0
+        try:
+            down = int(data.get('down'))
+        except:
+            down = 0
+        creativity = float(data.get('creativity'))
+        # Check if the Google ID is provided
+        if not user_id:
+            return jsonify({"error": "Google ID is missing"}), 400
+
+        # Query the database for the user with the given Google ID
+        user = User.query.filter_by(id=user_id).first()
+        if not os.path.exists("output"):
+            os.makedirs("output")
+        if user:
+            outpaintRequest(SD_API_KEY, prompt, left, right, up, down, b64String, f"output/{user_id}", filetype, creativity, seed)
+            return send_file (
+                f"output/{user_id}.{filetype}",
+                mimetype='image/*',
+                as_attachment=True,
+                download_name=f"output.{filetype}"
+            )
+        else:
+            # User not found
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        # Log unexpected errors and return a 500 error
+        print(f"Error in /outpaint: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+    pass
 
 # Initialize the database
 if __name__ == '__main__':
