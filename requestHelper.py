@@ -4,7 +4,7 @@ import requests
 import base64
 from io import BytesIO
 
-def generateRequest(api_key, prompt, negative_prompt, output_address, output_format, aspect_ratio, seed):
+def generateRequest(api_key, prompt, negative_prompt, output_format, aspect_ratio, seed):
     data = {}
     data['prompt'] = prompt
     data['output_format'] = output_format
@@ -29,7 +29,7 @@ def generateRequest(api_key, prompt, negative_prompt, output_address, output_for
     else:
         raise Exception(str(response.json()))
 
-def sketchRequest(api_key, prompt, negative_prompt, output_address, output_format, b64String, control_strength, seed):
+def sketchRequest(api_key, prompt, negative_prompt, output_format, b64String, control_strength, seed):
     data = {}
     data['prompt'] = prompt
     data['output_format'] = output_format
@@ -52,12 +52,13 @@ def sketchRequest(api_key, prompt, negative_prompt, output_address, output_forma
         data=data,
     )
     if response.status_code == 200:
-        with open(f"{output_address}.{output_format}", 'wb') as file:
-            file.write(response.content)
+        return base64.b64encode(response.content).decode('utf-8')
+    elif response.status_code == 403:
+        return "Content moderation triggered"
     else:
         raise Exception(str(response.json()))
 
-def styleRequest(api_key, prompt, negative_prompt, output_address, output_format, b64String, fidelity, seed):
+def styleRequest(api_key, prompt, negative_prompt, output_format, b64String, fidelity, seed):
     data = {}
     data['prompt'] = prompt
     data['output_format'] = output_format
@@ -80,12 +81,13 @@ def styleRequest(api_key, prompt, negative_prompt, output_address, output_format
         data=data,
     )
     if response.status_code == 200:
-        with open(f"{output_address}.{output_format}", 'wb') as file:
-            file.write(response.content)
+        return base64.b64encode(response.content).decode('utf-8')
+    elif response.status_code == 403:
+        return "Content moderation triggered"
     else:
         raise Exception(str(response.json()))
 
-def outpaintRequest(api_key, prompt, left, right, up, down, b64String, output_address, output_format, creativity, seed):
+def outpaintRequest(api_key, prompt, left, right, up, down, b64String, output_format, creativity, seed):
     data = {}
     data['prompt'] = prompt
     data['output_format'] = output_format
@@ -110,12 +112,13 @@ def outpaintRequest(api_key, prompt, left, right, up, down, b64String, output_ad
         data=data,
     )
     if response.status_code == 200:
-        with open(f"{output_address}.{output_format}", 'wb') as file:
-            file.write(response.content)
+        return base64.b64encode(response.content).decode('utf-8')
+    elif response.status_code == 403:
+        return "Content moderation triggered"
     else:
         raise Exception(str(response.json()))
 
-def searchAndReplaceRequest(api_key, searchPrompt, replacePrompt, negativePrompt, output_address, output_format, b64String, seed):
+def searchAndReplaceRequest(api_key, searchPrompt, replacePrompt, negativePrompt, output_format, b64String, seed):
     data = {}
     data['search_prompt'] = searchPrompt
     data['prompt'] = replacePrompt
@@ -138,12 +141,13 @@ def searchAndReplaceRequest(api_key, searchPrompt, replacePrompt, negativePrompt
         data=data,
     )
     if response.status_code == 200:
-        with open(f"{output_address}.{output_format}", 'wb') as file:
-            file.write(response.content)
+        return base64.b64encode(response.content).decode('utf-8')
+    elif response.status_code == 403:
+        return "Content moderation triggered"
     else:
         raise Exception(str(response.json()))
 
-def removeBackgroundRequest(api_key, output_address, output_format, b64String):
+def removeBackgroundRequest(api_key, output_format, b64String):
     imageBinary = base64.b64decode(b64String)
     image = BytesIO(imageBinary)
     response = requests.post(
@@ -160,8 +164,9 @@ def removeBackgroundRequest(api_key, output_address, output_format, b64String):
         },
     )
     if response.status_code == 200:
-        with open(f"{output_address}.{output_format}", 'wb') as file:
-            file.write(response.content)
+        return base64.b64encode(response.content).decode('utf-8')
+    elif response.status_code == 403:
+        return "Content moderation triggered"
     else:
         raise Exception(str(response.json()))
 
@@ -173,7 +178,6 @@ def removeBackgroundAndRelightRequest(
     keep_original_background,
     light_source_strength,
     light_source_direction,
-    output_address,
     output_format,
     b64String,
     foreground_prompt=None,
@@ -253,12 +257,12 @@ def removeBackgroundAndRelightRequest(
             print("Response:", poll_response.text)
             raise Exception(f"HTTP {poll_response.status_code}: {poll_response.text}")
 
-        if status_code == 200:
+        if status_code != 202:
             break
         time.sleep(10)
         if time.time() - start > timeout:
             raise Exception(f"Timeout after {timeout} seconds")
-
-    # Save the resulting image
-    with open(f"{output_address}.{output_format}", "wb") as file:
-        file.write(poll_response.content)
+    if status_code == 200:
+        return base64.b64encode(poll_response.content).decode('utf-8')
+    elif status_code == 403:
+        return "Content moderation triggered"

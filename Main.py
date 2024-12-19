@@ -176,7 +176,7 @@ def generate():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            b64String = generateRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, aspect_ratio, seed)
+            b64String = generateRequest(SD_API_KEY, prompt, negative_prompt, filetype, aspect_ratio, seed)
             if b64String == "Content moderation triggered":
                 return jsonify({"error": "Content moderation triggered"}), 400
             #Save to database
@@ -219,7 +219,7 @@ def sketch():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            sketchRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, b64String, control_strength, seed)
+            sketchRequest(SD_API_KEY, prompt, negative_prompt, filetype, b64String, control_strength, seed)
             return send_file (
                 f"output/{user_id}.{filetype}",
                 mimetype='image/*',
@@ -263,7 +263,7 @@ def style():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            styleRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, b64String, fidelity, seed)
+            styleRequest(SD_API_KEY, prompt, negative_prompt, filetype, b64String, fidelity, seed)
             return send_file (
                 f"output/{user_id}.{filetype}",
                 mimetype='image/*',
@@ -342,7 +342,7 @@ def outpaint():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            outpaintRequest(SD_API_KEY, prompt, left, right, up, down, b64String, f"output/{user_id}", filetype, creativity, seed)
+            outpaintRequest(SD_API_KEY, prompt, left, right, up, down, b64String, filetype, creativity, seed)
             return send_file (
                 f"output/{user_id}.{filetype}",
                 mimetype='image/*',
@@ -386,7 +386,7 @@ def searchAndReplace():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            searchAndReplaceRequest(SD_API_KEY, searchPrompt, replacementPrompt, negative_prompt, f"output/{user_id}", filetype, b64String, seed)
+            searchAndReplaceRequest(SD_API_KEY, searchPrompt, replacementPrompt, negative_prompt, filetype, b64String, seed)
             return send_file (
                 f"output/{user_id}.{filetype}",
                 mimetype='image/*',
@@ -421,7 +421,7 @@ def removeBackground():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            removeBackgroundRequest(SD_API_KEY, f"output/{user_id}", filetype, b64String)
+            removeBackgroundRequest(SD_API_KEY, filetype, b64String)
             return send_file (
                 f"output/{user_id}.{filetype}",
                 mimetype='image/*',
@@ -469,7 +469,7 @@ def removeBackgroundAndRelight():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            removeBackgroundAndRelightRequest(SD_API_KEY, background_prompt, preserve_original_subject, original_background_depth, keep_original_background, light_source_strength, light_source_direction, f"output/{user_id}", filetype, b64String, foreground_prompt, negative_prompt, seed)
+            removeBackgroundAndRelightRequest(SD_API_KEY, background_prompt, preserve_original_subject, original_background_depth, keep_original_background, light_source_strength, light_source_direction, filetype, b64String, foreground_prompt, negative_prompt, seed)
             return send_file(
                 f"output/{user_id}.{filetype}",
                 mimetype='image/*',
