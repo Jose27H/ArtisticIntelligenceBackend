@@ -44,11 +44,6 @@ class Image(db.Model):
         self.user_id = user_id
         self.image = image
 
-with app.app_context():
-  db.session.query(Image).delete()
-  db.session.commit()
-
-
 @app.route('/login', methods=['POST'])
 def login():
     print("login init")
