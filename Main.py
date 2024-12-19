@@ -177,7 +177,8 @@ def generate():
             os.makedirs("output")
         if user:
             b64String = generateRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, aspect_ratio, seed)
-            #Check for content filter
+            if b64String == "Content moderation triggered":
+                return jsonify({"error": "Content moderation triggered"}), 400
             #Save to database
             save_image(user_id, b64String)
             return b64String

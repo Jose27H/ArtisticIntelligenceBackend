@@ -24,6 +24,8 @@ def generateRequest(api_key, prompt, negative_prompt, output_address, output_for
 
     if response.status_code == 200:
         return base64.b64encode(response.content).decode('utf-8')
+    elif response.status_code == 403:
+        return "Content moderation triggered"
     else:
         raise Exception(str(response.json()))
 
@@ -233,7 +235,7 @@ def removeBackgroundAndRelightRequest(
         raise Exception("No generation ID found in response.")
 
     # Poll for the result
-    timeout = int(os.getenv("WORKER_TIMEOUT", 500))
+    timeout = 500
     start = time.time()
     status_code = 202
     while status_code == 202:
