@@ -152,44 +152,37 @@ def load_name():
 
 @app.route('/generate', methods=['POST'])
 def generate():
+    #Requires: prompt, aspect_ratio, filetype, user_id
+    #Optional: negative_prompt, seed
     try:
         # Parse the JSON payload from the request
         data = request.get_json()
-
-        # Log received data for debugging
-        print(f"Received payload: {data}")
-
         prompt = data.get('prompt')
         negative_prompt = data.get('negative_prompt')
         if negative_prompt == "":
             negative_prompt = None
         aspect_ratio = data.get('aspect_ratio')
         filetype = data.get('filetype')
-
         try:
             seed = int(data.get('seed'))
-        except (TypeError, ValueError):
-            seed = 42  # Default seed if invalid or not provided
-
-        # Ensure user_id is parsed as an integer
+        except:
+            seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
+        # Check if the Google ID is provided
         if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
-        try:
-            user_id = int(user_id)  # Ensure it's an integer
-        except (TypeError, ValueError):
-            return jsonify({"error": "Invalid user_id"}), 400
+            return jsonify({"error": "Google ID is missing "+str(user_id)}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
+        if not os.path.exists("output"):
+            os.makedirs("output")
         if user:
             b64String = generateRequest(SD_API_KEY, prompt, negative_prompt, filetype, aspect_ratio, seed)
             if b64String == "Content moderation triggered":
                 return jsonify({"error": "Content moderation triggered"}), 400
-
-            # Save to database
+            #Save to database
             save_image(user_id, b64String)
-            return jsonify({"image": b64String})
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
@@ -198,7 +191,6 @@ def generate():
         # Log unexpected errors and return a 500 error
         print(f"Error in /generate: {e}")
         return jsonify({"error": "Internal server error"}), 500
-
 
 @app.route('/sketch', methods=['POST'])
 def sketch():
