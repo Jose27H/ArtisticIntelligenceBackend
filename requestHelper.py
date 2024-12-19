@@ -1,3 +1,7 @@
+import json
+import os
+import time
+
 import requests
 import base64
 from io import BytesIO
@@ -161,6 +165,119 @@ def removeBackgroundRequest(api_key, output_address, output_format, b64String):
     else:
         raise Exception(str(response.json()))
 
-# from test import image_to_base64
-# b64String = image_to_base64("./sketch.png")
-# sketchRequest("sk-7pxhh6aU3wEzQW9VCTqbiDASmMMXgQhUmw7PbedAimUyOjVl", "a creepy wooden cathedral in the forest", None, "output/sketch", "png", b64String, 0.7, 0)
+import base64
+from io import BytesIO
+import json
+import os
+import time
+import requests
+
+import requests
+import time
+import os
+import json
+
+import requests
+import time
+import json
+import os
+from io import BytesIO
+import base64
+
+def removeBackgroundAndRelightRequest(
+    api_key,
+    background_prompt,
+    preserve_original_subject,
+    original_background_depth,
+    keep_original_background,
+    light_source_strength,
+    light_source_direction,
+    output_address,
+    output_format,
+    b64String,
+    foreground_prompt=None,
+    negative_prompt=None,
+    seed=None
+):
+    # Decode the base64-encoded image
+    image_binary = base64.b64decode(b64String)
+    image = BytesIO(image_binary)
+
+    # Prepare data payload
+    data = {
+        "background_prompt": background_prompt,
+        "preserve_original_subject": preserve_original_subject,
+        "original_background_depth": original_background_depth,
+        "keep_original_background": keep_original_background,
+        "light_source_strength": light_source_strength,
+        "light_source_direction": light_source_direction,
+        "output_format": output_format,
+    }
+
+    if foreground_prompt:
+        data["foreground_prompt"] = foreground_prompt
+    if negative_prompt:
+        data["negative_prompt"] = negative_prompt
+    if seed:
+        data["seed"] = seed
+
+    # Set up headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json",  # Ensure we expect a JSON response for the initial request
+    }
+
+    # Attach the image file
+    files = {
+        "subject_image": ("subject_image.png", image, "image/png"),
+    }
+
+    # Send the initial POST request
+    print("Sending initial request to Stability AI...")
+    response = requests.post(
+        "https://api.stability.ai/v2beta/stable-image/edit/replace-background-and-relight",
+        headers=headers,
+        data=data,
+        files=files,
+    )
+
+    if not response.ok:
+        print("Error in initial request:")
+        print("Status Code:", response.status_code)
+        print("Response:", response.text)
+        raise Exception(f"HTTP {response.status_code}: {response.text}")
+
+    # Parse response
+    response_dict = response.json()
+    generation_id = response_dict.get("id")
+    if not generation_id:
+        raise Exception("No generation ID found in response.")
+
+    # Poll for the result
+    timeout = int(os.getenv("WORKER_TIMEOUT", 500))
+    start = time.time()
+    status_code = 202
+    while status_code == 202:
+        poll_response = requests.get(
+            f"https://api.stability.ai/v2beta/results/{generation_id}",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Accept": "*/*",
+            },
+        )
+        status_code = poll_response.status_code
+        if not poll_response.ok and status_code != 202:
+            print("Error in polling response:")
+            print("Status Code:", poll_response.status_code)
+            print("Response:", poll_response.text)
+            raise Exception(f"HTTP {poll_response.status_code}: {poll_response.text}")
+
+        if status_code == 200:
+            break
+        time.sleep(10)
+        if time.time() - start > timeout:
+            raise Exception(f"Timeout after {timeout} seconds")
+
+    # Save the resulting image
+    with open(f"{output_address}.{output_format}", "wb") as file:
+        file.write(poll_response.content)

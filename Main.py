@@ -1,6 +1,6 @@
 import base64
 import os
-from requestHelper import generateRequest, sketchRequest, styleRequest, outpaintRequest, searchAndReplaceRequest, removeBackgroundRequest
+from requestHelper import generateRequest, sketchRequest, styleRequest, outpaintRequest, searchAndReplaceRequest, removeBackgroundRequest, removeBackgroundAndRelightRequest
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -437,6 +437,56 @@ def removeBackground():
         # Log unexpected errors and return a 500 error
         print(f"Error in /removeBackground: {e}")
         return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/removeBackgroundAndRelight', methods=['POST'])
+def removeBackgroundAndRelight():
+    #Required: user_id, b64String,background_prompt, preserve_original_subject, original_background_depth, keep_original_background
+    #light_source_strength, light_source_direction, filetype
+    #Optional: seed, foreground_prompt, negative_prompt
+    try:
+        # Parse the JSON payload from the request
+        data = request.get_json()
+        background_prompt = data.get('background_prompt')
+        preserve_original_subject = data.get('preserve_original_subject')
+        original_background_depth = data.get('original_background_depth')
+        keep_original_background = data.get('keep_original_background')
+        light_source_strength = data.get('light_source_strength')
+        light_source_direction = data.get('light_source_direction')
+        filetype = data.get('filetype')
+        try:
+            seed = int(data.get('seed'))
+        except:
+            seed = 42 # If no seed is provided, use 42 because it's the answer to everything
+        user_id = data.get('user_id')
+        b64String = data.get('b64String')
+        foreground_prompt = data.get('foreground_prompt')
+        negative_prompt = data.get('negative_prompt')
+        # Check if the Google ID is provided
+        if not user_id:
+            return jsonify({"error": "Google ID is missing"}), 400
+
+        # Query the database for the user with the given Google ID
+        user = User.query.filter_by(id=user_id).first()
+        if not os.path.exists("output"):
+            os.makedirs("output")
+        if user:
+            removeBackgroundAndRelightRequest(SD_API_KEY, background_prompt, preserve_original_subject, original_background_depth, keep_original_background, light_source_strength, light_source_direction, f"output/{user_id}", filetype, b64String, foreground_prompt, negative_prompt, seed)
+            return send_file(
+                f"output/{user_id}.{filetype}",
+                mimetype='image/*',
+                as_attachment=True,
+                download_name=f"output.{filetype}"
+            )
+        else:
+            # User not found
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        # Log unexpected errors and return a 500 error
+        print(f"Error in /removeBackgroundAndRelight: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
 
 # Initialize the database
 if __name__ == '__main__':
