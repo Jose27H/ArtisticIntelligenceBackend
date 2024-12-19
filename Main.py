@@ -96,7 +96,9 @@ def login():
         print(f"Unexpected error: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
 
-
+with app.app_context():
+  db.session.query(Image).delete()
+  db.session.commit()
 
 # Endpoint: Message
 @app.route('/message', methods=['POST'])
