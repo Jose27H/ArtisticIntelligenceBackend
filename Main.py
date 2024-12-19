@@ -170,6 +170,9 @@ def generate():
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
+        
+
+        
 
     except Exception as e:
         # Log unexpected errors and return a 500 error
