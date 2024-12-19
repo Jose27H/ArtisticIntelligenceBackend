@@ -96,7 +96,7 @@ def login():
     except Exception as e:
         # Log unexpected errors
         print(f"Unexpected error: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 
 
@@ -144,7 +144,7 @@ def load_name():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /loadName: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 
 @app.route('/generate', methods=['POST'])
@@ -184,7 +184,7 @@ def generate():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /generate: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 @app.route('/sketch', methods=['POST'])
 def sketch():
@@ -224,7 +224,7 @@ def sketch():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /sketch: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 @app.route('/style', methods=['POST'])
 def style():
@@ -263,7 +263,7 @@ def style():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /style: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
     
     
 def save_image(user_id, base64_image):
@@ -285,7 +285,7 @@ def save_image(user_id, base64_image):
 
     except Exception as e:
         print(f"Error in save_image: {e}")
-        return {"error": "Internal server error"}, 500
+        return {"error": f"Internal server error: {e}"}, 500
 
 @app.route('/outpaint', methods=['POST'])
 def outpaint():
@@ -337,7 +337,7 @@ def outpaint():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /outpaint: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 @app.route('/searchAndReplace', methods=['POST'])
 def searchAndReplace():
@@ -377,7 +377,7 @@ def searchAndReplace():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /searchAndReplace: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 @app.route('/removeBackground', methods=['POST'])
 def removeBackground():
@@ -408,7 +408,7 @@ def removeBackground():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /removeBackground: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 @app.route('/removeBackgroundAndRelight', methods=['POST'])
 def removeBackgroundAndRelight():
@@ -452,7 +452,7 @@ def removeBackgroundAndRelight():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /removeBackgroundAndRelight: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 
 @app.route('/viewallimages', methods=['POST'])
