@@ -433,7 +433,7 @@ def removeBackgroundAndRelight():
         except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
-        b64String = data.get('b64String')
+        b64String = data.get('b64_string')
         foreground_prompt = data.get('foreground_prompt')
         negative_prompt = data.get('negative_prompt')
         # Check if the Google ID is provided
