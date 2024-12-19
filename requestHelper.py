@@ -111,6 +111,34 @@ def outpaintRequest(api_key, prompt, left, right, up, down, b64String, output_ad
     else:
         raise Exception(str(response.json()))
 
+def searchAndReplaceRequest(api_key, searchPrompt, replacePrompt, negativePrompt, output_address, output_format, b64String, seed):
+    data = {}
+    data['search_prompt'] = searchPrompt
+    data['prompt'] = replacePrompt
+    data['output_format'] = output_format
+    data['seed'] = seed
+    if negativePrompt:
+        data['negative_prompt'] = negativePrompt
+    b64Image = b64String
+    imageBinary = base64.b64decode(b64Image)
+    image = BytesIO(imageBinary)
+    response = requests.post(
+        f"https://api.stability.ai/v2beta/stable-image/control/search-and-replace",
+        headers={
+            "authorization": f"Bearer {api_key}",
+            "accept": "image/*"
+        },
+        files={
+            "image": ("searchAndReplace.png", image, "image/png")
+        },
+        data=data,
+    )
+    if response.status_code == 200:
+        with open(f"{output_address}.{output_format}", 'wb') as file:
+            file.write(response.content)
+    else:
+        raise Exception(str(response.json()))
+
 
 
 # from test import image_to_base64
