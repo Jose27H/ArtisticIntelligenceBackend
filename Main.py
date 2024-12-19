@@ -1,5 +1,5 @@
 import os
-from requestHelper import generateRequest, sketchRequest
+from requestHelper import generateRequest, sketchRequest, styleRequest
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -173,7 +173,7 @@ def generate():
 
     except Exception as e:
         # Log unexpected errors and return a 500 error
-        print(f"Error in /loadName: {e}")
+        print(f"Error in /generate: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/sketch', methods=['POST'])
@@ -216,7 +216,50 @@ def sketch():
 
     except Exception as e:
         # Log unexpected errors and return a 500 error
-        print(f"Error in /loadName: {e}")
+        print(f"Error in /sketch: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/style', methods=['POST'])
+def style():
+    #Requires: prompt, filetype, user_id, b64String, fidelity
+    #Optional: negative_prompt, seed
+    try:
+        # Parse the JSON payload from the request
+        data = request.get_json()
+        prompt = data.get('prompt')
+        negative_prompt = data.get('negative_prompt')
+        if negative_prompt == "":
+            negative_prompt = None
+        fidelity = float(data.get('fidelity'))
+        filetype = data.get('filetype')
+        seed = int(data.get('seed'))
+        if seed == "":
+            seed = 42 # If no seed is provided, use 42 because it's the answer to everything
+        user_id = data.get('user_id')
+        b64String = data.get('b64String')
+        # Check if the Google ID is provided
+        if not user_id:
+            return jsonify({"error": "Google ID is missing"}), 400
+
+        # Query the database for the user with the given Google ID
+        user = User.query.filter_by(id=user_id).first()
+        if not os.path.exists("output"):
+            os.makedirs("output")
+        if user:
+            styleRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, b64String, fidelity, seed)
+            return send_file (
+                f"output/{user_id}.{filetype}",
+                mimetype='image/*',
+                as_attachment=True,
+                download_name=f"output.{filetype}"
+            )
+        else:
+            # User not found
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        # Log unexpected errors and return a 500 error
+        print(f"Error in /style: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 
