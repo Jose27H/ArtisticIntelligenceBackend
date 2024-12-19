@@ -176,13 +176,11 @@ def generate():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            generateRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, aspect_ratio, seed)
-            return send_file (
-                f"output/{user_id}.{filetype}",
-                mimetype='image/*',
-                as_attachment=True,
-                download_name=f"output.{filetype}"
-            )
+            b64String = generateRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, aspect_ratio, seed)
+            #Check for content filter
+            #Save to database
+            save_image(user_id, b64String)
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404

@@ -1,10 +1,9 @@
-import json
 import os
 import time
-
 import requests
 import base64
 from io import BytesIO
+
 def generateRequest(api_key, prompt, negative_prompt, output_address, output_format, aspect_ratio, seed):
     data = {}
     data['prompt'] = prompt
@@ -24,8 +23,7 @@ def generateRequest(api_key, prompt, negative_prompt, output_address, output_for
     )
 
     if response.status_code == 200:
-        with open(f"{output_address}.{output_format}", 'wb') as file:
-            file.write(response.content)
+        return base64.b64encode(response.content).decode('utf-8')
     else:
         raise Exception(str(response.json()))
 
@@ -164,25 +162,6 @@ def removeBackgroundRequest(api_key, output_address, output_format, b64String):
             file.write(response.content)
     else:
         raise Exception(str(response.json()))
-
-import base64
-from io import BytesIO
-import json
-import os
-import time
-import requests
-
-import requests
-import time
-import os
-import json
-
-import requests
-import time
-import json
-import os
-from io import BytesIO
-import base64
 
 def removeBackgroundAndRelightRequest(
     api_key,
