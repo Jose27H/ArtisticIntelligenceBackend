@@ -95,7 +95,7 @@ def outpaintRequest(api_key, prompt, left, right, up, down, b64String, output_ad
     imageBinary = base64.b64decode(b64Image)
     image = BytesIO(imageBinary)
     response = requests.post(
-        f"https://api.stability.ai/v2beta/stable-image/control/outpaint",
+        f"https://api.stability.ai/v2beta/stable-image/edit/outpaint",
         headers={
             "authorization": f"Bearer {api_key}",
             "accept": "image/*"
@@ -123,7 +123,7 @@ def searchAndReplaceRequest(api_key, searchPrompt, replacePrompt, negativePrompt
     imageBinary = base64.b64decode(b64Image)
     image = BytesIO(imageBinary)
     response = requests.post(
-        f"https://api.stability.ai/v2beta/stable-image/control/search-and-replace",
+        f"https://api.stability.ai/v2beta/stable-image/edit/search-and-replace",
         headers={
             "authorization": f"Bearer {api_key}",
             "accept": "image/*"
@@ -139,7 +139,27 @@ def searchAndReplaceRequest(api_key, searchPrompt, replacePrompt, negativePrompt
     else:
         raise Exception(str(response.json()))
 
-
+def removeBackgroundRequest(api_key, output_address, output_format, b64String):
+    imageBinary = base64.b64decode(b64String)
+    image = BytesIO(imageBinary)
+    response = requests.post(
+        f"https://api.stability.ai/v2beta/stable-image/edit/remove-background",
+        headers={
+            "authorization": f"Bearer {api_key}",
+            "accept": "image/*"
+        },
+        files={
+            "image": ("removeBackground.png", image, "image/png")
+        },
+        data={
+            "output_format": output_format
+        },
+    )
+    if response.status_code == 200:
+        with open(f"{output_address}.{output_format}", 'wb') as file:
+            file.write(response.content)
+    else:
+        raise Exception(str(response.json()))
 
 # from test import image_to_base64
 # b64String = image_to_base64("./sketch.png")
