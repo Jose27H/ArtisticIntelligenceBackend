@@ -1,3 +1,4 @@
+import base64
 import os
 from requestHelper import generateRequest, sketchRequest, styleRequest, outpaintRequest
 from flask import Flask, request, jsonify
