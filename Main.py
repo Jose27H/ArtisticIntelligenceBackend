@@ -6,7 +6,6 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from flask import send_file
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -47,10 +46,11 @@ class Image(db.Model):
         self.user_id = user_id
         self.image = image
 
+with app.app_context():
+    db.session.query(Image).delete()
+    # Commit changes to persist deletion
+    db.session.commit()
 
-db.session.query(Image).delete()
-# Commit changes to persist deletion
-db.session.commit()
 @app.route('/login', methods=['POST'])
 def login():
     print("login init")
