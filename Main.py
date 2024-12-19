@@ -168,10 +168,6 @@ def generate():
         except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
-        # Check if the Google ID is provided
-        if not user_id:
-            print("Sending Error Message")
-            return jsonify({"error": "Google ID is missing backend "+str(user_id)}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
@@ -213,8 +209,6 @@ def sketch():
         user_id = data.get('user_id')
         b64String = data.get('b64String')
         # Check if the Google ID is provided
-        if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
@@ -254,9 +248,6 @@ def style():
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
         b64String = data.get('b64_string')
-        # Check if the Google ID is provided
-        if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
@@ -331,9 +322,6 @@ def outpaint():
         except:
             down = 0
         creativity = float(data.get('creativity'))
-        # Check if the Google ID is provided
-        if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
@@ -374,8 +362,6 @@ def searchAndReplace():
         user_id = data.get('user_id')
         b64String = data.get('b64_string')
         # Check if the Google ID is provided
-        if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
@@ -407,8 +393,6 @@ def removeBackground():
         user_id = data.get('user_id')
         b64String = data.get('b64_string')
         # Check if the Google ID is provided
-        if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
@@ -453,8 +437,6 @@ def removeBackgroundAndRelight():
         foreground_prompt = data.get('foreground_prompt')
         negative_prompt = data.get('negative_prompt')
         # Check if the Google ID is provided
-        if not user_id:
-            return jsonify({"error": "Google ID is missing"}), 400
 
         # Query the database for the user with the given Google ID
         user = User.query.filter_by(id=user_id).first()
