@@ -147,7 +147,7 @@ def generate():
             negative_prompt = None
         aspect_ratio = data.get('aspect_ratio')
         filetype = data.get('filetype')
-        seed = data.get('seed')
+        seed = int(data.get('seed'))
         if seed == "":
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
