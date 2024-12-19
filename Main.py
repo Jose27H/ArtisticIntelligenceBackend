@@ -253,7 +253,7 @@ def style():
         except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
-        b64String = data.get('b64String')
+        b64String = data.get('b64_string')
         # Check if the Google ID is provided
         if not user_id:
             return jsonify({"error": "Google ID is missing"}), 400
@@ -315,7 +315,7 @@ def outpaint():
         except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
-        b64String = data.get('b64String')
+        b64String = data.get('b64_string')
         try:
             left = int(data.get('left'))
         except:
@@ -365,8 +365,8 @@ def searchAndReplace():
     try:
         # Parse the JSON payload from the request
         data = request.get_json()
-        searchPrompt = data.get('searchPrompt')
-        replacementPrompt = data.get('replacementPrompt')
+        searchPrompt = data.get('search_prompt')
+        replacementPrompt = data.get('replacement_prompt')
         negative_prompt = data.get('negative_prompt')
         if negative_prompt == "":
             negative_prompt = None
@@ -376,7 +376,7 @@ def searchAndReplace():
         except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
-        b64String = data.get('b64String')
+        b64String = data.get('b64_string')
         # Check if the Google ID is provided
         if not user_id:
             return jsonify({"error": "Google ID is missing"}), 400
@@ -411,7 +411,7 @@ def removeBackground():
         data = request.get_json()
         filetype = data.get('filetype')
         user_id = data.get('user_id')
-        b64String = data.get('b64String')
+        b64String = data.get('b64_string')
         # Check if the Google ID is provided
         if not user_id:
             return jsonify({"error": "Google ID is missing"}), 400
