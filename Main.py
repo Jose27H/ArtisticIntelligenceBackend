@@ -262,7 +262,6 @@ def style():
         print(f"Error in /style: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
-
 # Initialize the database
 if __name__ == '__main__':
     with app.app_context():
