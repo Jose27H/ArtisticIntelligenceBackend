@@ -219,13 +219,11 @@ def sketch():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            sketchRequest(SD_API_KEY, prompt, negative_prompt, filetype, b64String, control_strength, seed)
-            return send_file (
-                f"output/{user_id}.{filetype}",
-                mimetype='image/*',
-                as_attachment=True,
-                download_name=f"output.{filetype}"
-            )
+            b64String = sketchRequest(SD_API_KEY, prompt, negative_prompt, filetype, b64String, control_strength, seed)
+            if b64String == "Content moderation triggered":
+                return jsonify({"error": "Content moderation triggered"}), 400
+            save_image(user_id, b64String)
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
@@ -263,13 +261,11 @@ def style():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            styleRequest(SD_API_KEY, prompt, negative_prompt, filetype, b64String, fidelity, seed)
-            return send_file (
-                f"output/{user_id}.{filetype}",
-                mimetype='image/*',
-                as_attachment=True,
-                download_name=f"output.{filetype}"
-            )
+            b64String = styleRequest(SD_API_KEY, prompt, negative_prompt, filetype, b64String, fidelity, seed)
+            if b64String == "Content moderation triggered":
+                return jsonify({"error": "Content moderation triggered"}), 400
+            save_image(user_id, b64String)
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
@@ -342,13 +338,11 @@ def outpaint():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            outpaintRequest(SD_API_KEY, prompt, left, right, up, down, b64String, filetype, creativity, seed)
-            return send_file (
-                f"output/{user_id}.{filetype}",
-                mimetype='image/*',
-                as_attachment=True,
-                download_name=f"output.{filetype}"
-            )
+            b64String = outpaintRequest(SD_API_KEY, prompt, left, right, up, down, b64String, filetype, creativity, seed)
+            if b64String == "Content moderation triggered":
+                return jsonify({"error": "Content moderation triggered"}), 400
+            save_image(user_id, b64String)
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
@@ -386,13 +380,11 @@ def searchAndReplace():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            searchAndReplaceRequest(SD_API_KEY, searchPrompt, replacementPrompt, negative_prompt, filetype, b64String, seed)
-            return send_file (
-                f"output/{user_id}.{filetype}",
-                mimetype='image/*',
-                as_attachment=True,
-                download_name=f"output.{filetype}"
-            )
+            b64String = searchAndReplaceRequest(SD_API_KEY, searchPrompt, replacementPrompt, negative_prompt, filetype, b64String, seed)
+            if b64String == "Content moderation triggered":
+                return jsonify({"error": "Content moderation triggered"}), 400
+            save_image(user_id, b64String)
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
@@ -421,13 +413,11 @@ def removeBackground():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            removeBackgroundRequest(SD_API_KEY, filetype, b64String)
-            return send_file (
-                f"output/{user_id}.{filetype}",
-                mimetype='image/*',
-                as_attachment=True,
-                download_name=f"output.{filetype}"
-            )
+            b64String = removeBackgroundRequest(SD_API_KEY, filetype, b64String)
+            if b64String == "Content moderation triggered":
+                return jsonify({"error": "Content moderation triggered"}), 400
+            save_image(user_id, b64String)
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
@@ -469,13 +459,11 @@ def removeBackgroundAndRelight():
         if not os.path.exists("output"):
             os.makedirs("output")
         if user:
-            removeBackgroundAndRelightRequest(SD_API_KEY, background_prompt, preserve_original_subject, original_background_depth, keep_original_background, light_source_strength, light_source_direction, filetype, b64String, foreground_prompt, negative_prompt, seed)
-            return send_file(
-                f"output/{user_id}.{filetype}",
-                mimetype='image/*',
-                as_attachment=True,
-                download_name=f"output.{filetype}"
-            )
+            b64String = removeBackgroundAndRelightRequest(SD_API_KEY, background_prompt, preserve_original_subject, original_background_depth, keep_original_background, light_source_strength, light_source_direction, filetype, b64String, foreground_prompt, negative_prompt, seed)
+            if b64String == "Content moderation triggered":
+                return jsonify({"error": "Content moderation triggered"}), 400
+            save_image(user_id, b64String)
+            return b64String
         else:
             # User not found
             return jsonify({"error": "User not found"}), 404
