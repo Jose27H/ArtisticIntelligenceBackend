@@ -278,6 +278,28 @@ def style():
         # Log unexpected errors and return a 500 error
         print(f"Error in /style: {e}")
         return jsonify({"error": "Internal server error"}), 500
+    
+    
+def save_image(user_id, base64_image):
+    try:
+        # Decode Base64 image string into binary data
+        image_data = base64.b64decode(base64_image)
+
+        # Verify if the user exists
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return {"error": "User not found"}, 404
+
+        # Save the image to the database
+        new_image = Image(user_id=user_id, image=image_data)
+        db.session.add(new_image)
+        db.session.commit()
+
+        return {"message": "Image saved successfully", "image_id": new_image.id}, 200
+
+    except Exception as e:
+        print(f"Error in save_image: {e}")
+        return {"error": "Internal server error"}, 500
 
 # Initialize the database
 if __name__ == '__main__':
