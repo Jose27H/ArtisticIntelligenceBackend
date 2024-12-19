@@ -162,8 +162,9 @@ def generate():
             negative_prompt = None
         aspect_ratio = data.get('aspect_ratio')
         filetype = data.get('filetype')
-        seed = int(data.get('seed'))
-        if seed == "":
+        try:
+            seed = int(data.get('seed'))
+        except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
         # Check if the Google ID is provided
@@ -204,8 +205,9 @@ def sketch():
             negative_prompt = None
         control_strength = float(data.get('control_strength'))
         filetype = data.get('filetype')
-        seed = int(data.get('seed'))
-        if seed == "":
+        try:
+            seed = int(data.get('seed'))
+        except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
         b64String = data.get('b64String')
@@ -247,8 +249,9 @@ def style():
             negative_prompt = None
         fidelity = float(data.get('fidelity'))
         filetype = data.get('filetype')
-        seed = int(data.get('seed'))
-        if seed == "":
+        try:
+            seed = int(data.get('seed'))
+        except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
         b64String = data.get('b64String')
@@ -308,8 +311,9 @@ def outpaint():
         data = request.get_json()
         prompt = data.get('prompt')
         filetype = data.get('filetype')
-        seed = int(data.get('seed'))
-        if seed == "":
+        try:
+            seed = int(data.get('seed'))
+        except:
             seed = 42 # If no seed is provided, use 42 because it's the answer to everything
         user_id = data.get('user_id')
         b64String = data.get('b64String')
@@ -353,6 +357,50 @@ def outpaint():
     except Exception as e:
         # Log unexpected errors and return a 500 error
         print(f"Error in /outpaint: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/searchAndReplace', methods=['POST'])
+def searchAndReplace():
+    #Requires: searchPrompt, replacementPrompt, filetype, user_id, b64String
+    #Optional: Negative prompt, seed
+    try:
+        # Parse the JSON payload from the request
+        data = request.get_json()
+        searchPrompt = data.get('searchPrompt')
+        replacementPrompt = data.get('replacementPrompt')
+        negative_prompt = data.get('negative_prompt')
+        if negative_prompt == "":
+            negative_prompt = None
+        filetype = data.get('filetype')
+        try:
+            seed = int(data.get('seed'))
+        except:
+            seed = 42 # If no seed is provided, use 42 because it's the answer to everything
+        user_id = data.get('user_id')
+        b64String = data.get('b64String')
+        # Check if the Google ID is provided
+        if not user_id:
+            return jsonify({"error": "Google ID is missing"}), 400
+
+        # Query the database for the user with the given Google ID
+        user = User.query.filter_by(id=user_id).first()
+        if not os.path.exists("output"):
+            os.makedirs("output")
+        if user:
+            searchAndReplaceRequest(SD_API_KEY, searchPrompt, replacementPrompt, negative_prompt, f"output/{user_id}", filetype, b64String, seed)
+            return send_file (
+                f"output/{user_id}.{filetype}",
+                mimetype='image/*',
+                as_attachment=True,
+                download_name=f"output.{filetype}"
+            )
+        else:
+            # User not found
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        # Log unexpected errors and return a 500 error
+        print(f"Error in /searchAndReplace: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 # Initialize the database
