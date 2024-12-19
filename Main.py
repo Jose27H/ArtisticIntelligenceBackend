@@ -356,7 +356,6 @@ def outpaint():
         # Log unexpected errors and return a 500 error
         print(f"Error in /outpaint: {e}")
         return jsonify({"error": "Internal server error"}), 500
-    pass
 
 # Initialize the database
 if __name__ == '__main__':
