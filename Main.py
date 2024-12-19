@@ -34,6 +34,20 @@ class User(db.Model):
         self.name = name
 
 
+# Image model for PostgreSQL
+class Image(db.Model):
+    __tablename__ = 'images'
+    id = db.Column(db.Integer, primary_key=True)  # Auto-incrementing ID
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to users table
+    image = db.Column(db.LargeBinary, nullable=False)  # Binary data for the image
+    date = db.Column(db.DateTime, default=db.func.now(), nullable=False)  # Auto-generated timestamp
+
+    def __init__(self, user_id, image):
+        self.user_id = user_id
+        self.image = image
+
+
+
 @app.route('/login', methods=['POST'])
 def login():
     print("login init")
