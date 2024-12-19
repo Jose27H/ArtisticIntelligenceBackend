@@ -1,8 +1,11 @@
+import os
+from requestHelper import generateRequest
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from flask import send_file
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -10,6 +13,7 @@ CORS(app)
 
 # Replace this with your Web Client ID from Google Cloud Console
 CLIENT_ID = "106905994125-blt7hpufeifo2lt46gafm8frf9fmaed5.apps.googleusercontent.com"
+SD_API_KEY = "sk-7pxhh6aU3wEzQW9VCTqbiDASmMMXgQhUmw7PbedAimUyOjVl"#os.environ.get('SD_API_KEY')
 
 # Replace this with your PostgreSQL connection URL
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:dEuOkPJxLBZbVAmThWQzjcordfOVBNdw@postgres.railway.internal:5432/railway"
@@ -130,6 +134,47 @@ def load_name():
         print(f"Error in /loadName: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route('/generate', methods=['POST'])
+def generate():
+    #Requires: prompt, aspect_ratio, filetype, user_id
+    #Optional: negative_prompt, seed
+    try:
+        # Parse the JSON payload from the request
+        data = request.get_json()
+        prompt = data.get('prompt')
+        negative_prompt = data.get('negative_prompt')
+        if negative_prompt == "":
+            negative_prompt = None
+        aspect_ratio = data.get('aspect_ratio')
+        filetype = data.get('filetype')
+        seed = data.get('seed')
+        if seed == "":
+            seed = 42 # If no seed is provided, use 42 because it's the answer to everything
+        user_id = data.get('user_id')
+        # Check if the Google ID is provided
+        if not user_id:
+            return jsonify({"error": "Google ID is missing"}), 400
+
+        # Query the database for the user with the given Google ID
+        user = User.query.filter_by(id=user_id).first()
+        if not os.path.exists("output"):
+            os.makedirs("output")
+        if user:
+            generateRequest(SD_API_KEY, prompt, negative_prompt, f"output/{user_id}", filetype, aspect_ratio, seed)
+            return send_file (
+                f"output/{user_id}.{filetype}",
+                mimetype='image/*',
+                as_attachment=True,
+                download_name=f"output.{filetype}"
+            )
+        else:
+            # User not found
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        # Log unexpected errors and return a 500 error
+        print(f"Error in /loadName: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 # Initialize the database
 if __name__ == '__main__':
