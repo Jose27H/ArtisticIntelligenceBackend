@@ -48,7 +48,9 @@ class Image(db.Model):
         self.image = image
 
 
-
+db.session.query(Image).delete()
+# Commit changes to persist deletion
+db.session.commit()
 @app.route('/login', methods=['POST'])
 def login():
     print("login init")
